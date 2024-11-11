@@ -1,29 +1,18 @@
 package use_case.DeleteItem;
 
-import entity.ToDoItem;
-import java.util.Optional;
-
+import use_case.AddItem.ToDoItemDataAccessInterface;
 
 public class DeleteToDoItemInteractor implements DeleteToDoItemInputBoundary {
+    private final ToDoItemDataAccessInterface toDoDataAccess;
 
-    private final DeleteToDoItemOutputBoundary outputBoundary;
-    private final DeleteToDoItemDataAccessInterface dataAccess;
-
-    public DeleteToDoItemInteractor(DeleteToDoItemOutputBoundary outputBoundary,
-                                    DeleteToDoItemDataAccessInterface dataAccess) {
-        this.outputBoundary = outputBoundary;
-        this.dataAccess = dataAccess;
+    public DeleteToDoItemInteractor(ToDoItemDataAccessInterface toDoDataAccess) {
+        this.toDoDataAccess = toDoDataAccess;
     }
 
-
+    @Override
     public void execute(DeleteToDoItemInputData inputData) {
-        Optional<ToDoItem> toDoItem = dataAccess.findByTitle(inputData.getTitle());
-
-        if (toDoItem.isPresent()) {
-            dataAccess.delete(inputData.getTitle());
-            outputBoundary.presentDeleteToDoItem(new DeleteToDoItemOutputData(true, "Item deleted successfully."));
-        } else {
-            outputBoundary.presentDeleteToDoItem(new DeleteToDoItemOutputData(false, "Item not found with title: " + inputData.getTitle()));
+        if (toDoDataAccess.existsByTitle(inputData.getTitle())) {
+            toDoDataAccess.delete(inputData.getTitle());
         }
     }
 }

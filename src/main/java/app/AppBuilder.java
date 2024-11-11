@@ -12,12 +12,15 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.addItem.AddToDoItemController;
 import interface_adapter.addItem.AddToDoItemPresenter;
 import interface_adapter.addItem.AddToDoItemViewModel;
+import interface_adapter.DeleteItem.DeleteToDoItemController;
 import interface_adapter.EditToDoItem.EditToDoItemController;
 import interface_adapter.EditToDoItem.EditToDoItemPresenter;
 import interface_adapter.EditToDoItem.EditToDoItemViewModel;
 import use_case.AddItem.AddToDoItemInputBoundary;
 import use_case.AddItem.AddToDoItemInteractor;
 import use_case.AddItem.AddToDoItemOutputBoundary;
+import use_case.DeleteItem.DeleteToDoItemInputBoundary;
+import use_case.DeleteItem.DeleteToDoItemInteractor;
 import use_case.EditToDoItem.EditToDoItemInputBoundary;
 import use_case.EditToDoItem.EditToDoItemInteractor;
 import use_case.EditToDoItem.EditToDoItemOutputBoundary;
@@ -98,6 +101,18 @@ public class AppBuilder {
         return this;
     }
 
+
+    /**
+     * Adds the Delete To-Do Item Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addDeleteToDoItemUseCase() {
+        DeleteToDoItemInputBoundary deleteToDoItemInteractor = new DeleteToDoItemInteractor(toDoDataAccess);
+        DeleteToDoItemController deleteToDoController = new DeleteToDoItemController(deleteToDoItemInteractor);
+
+        toDoListView.setDeleteToDoController(deleteToDoController);
+        return this;
+    }
 
     /**
      * Creates the JFrame for the application and sets the ToDoListView to be displayed initially.

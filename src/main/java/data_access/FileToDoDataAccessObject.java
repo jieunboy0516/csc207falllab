@@ -94,4 +94,9 @@ public class FileToDoDataAccessObject {
         toDoItems.put(item.getTitle(), item);
         save();
     }
+
+    public void delete(String title) {
+        toDoItems.remove(title);
+    }
+
 }

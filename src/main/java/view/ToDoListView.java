@@ -11,10 +11,10 @@ import java.time.LocalDate;
 import javax.swing.*;
 
 import data_access.InMemoryToDoDataAccessObject;
-import entity.ToDoItem;
 import interface_adapter.EditToDoItem.EditToDoItemController;
 import interface_adapter.addItem.AddToDoItemController;
 import interface_adapter.addItem.AddToDoItemViewModel;
+import interface_adapter.DeleteItem.DeleteToDoItemController;
 
 /**
  * The View for displaying and managing the to-do list.
@@ -40,6 +40,8 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
     private JList<String> toDoListDisplay = new JList<>(new DefaultListModel<>());
     private AddToDoItemController toDoController;
     private EditToDoItemController editToDoController;
+    private DeleteToDoItemController deleteToDoController;
+
 
     public ToDoListView(AddToDoItemViewModel toDoViewModel, InMemoryToDoDataAccessObject toDoDataAccess) {
         this.toDoViewModel = toDoViewModel;
@@ -84,7 +86,11 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
             if (evt.getSource().equals(deleteButton)) {
                 String selectedItem = toDoListDisplay.getSelectedValue();
                 if (selectedItem != null) {
-//                    toDoController.deleteToDoItem(selectedItem);
+                    int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this item?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        deleteToDoController.deleteToDoItem(selectedItem);
+                        updateToDoListDisplay();  // Refresh the list after deletion
+                    }
                 }
             }
         });
@@ -168,6 +174,12 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
     public void setEditToDoController(EditToDoItemController editToDoController) {
         this.editToDoController = editToDoController;
     }
+
+    public void setDeleteToDoController(DeleteToDoItemController deleteToDoController) {
+        this.deleteToDoController = deleteToDoController;
+    }
+
+
 }
 
 

@@ -17,6 +17,7 @@ public class Main {
                 .addToDoListView()
                 .addAddToDoItemUseCase()
                 .addEditToDoItemUseCase()
+                .addDeleteToDoItemUseCase()
                 .build();
 
         application.pack();
