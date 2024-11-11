@@ -2,8 +2,6 @@ package use_case.AddItem;
 
 import data_access.InMemoryToDoDataAccessObject;
 import entity.ToDoItemFactory;
-import entity.ToDoItem;
-import org.junit.Test;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -17,49 +15,46 @@ class AddToDoItemInteractorTest {
         AddToDoItemInputData inputData = new AddToDoItemInputData("Grocery Shopping", "Buy groceries for the week", LocalDate.now(), 2);
         ToDoItemDataAccessInterface toDoRepository = new InMemoryToDoDataAccessObject();
 
-        // This creates a successPresenter that tests whether the test case is as we expect.
+        // Create a successPresenter that verifies the output data and repository state
         AddToDoItemOutputBoundary successPresenter = new AddToDoItemOutputBoundary() {
             @Override
-            public void prepareSuccessView(AddToDoItemOutputData toDoItemData) {
-                // Check that the output data is correct and that the item has been created in the DAO.
-                assertEquals("Grocery Shopping", toDoItemData.getTitle());
+            public void presentAddToDoItem(AddToDoItemOutputData outputData) {
+                // Assertions to confirm the interactor is working as expected
+                assertNotNull(outputData);
+                assertEquals("Grocery Shopping", outputData.getToDoItem().getTitle());
                 assertTrue(toDoRepository.existsByTitle("Grocery Shopping"));
-            }
-
-            @Override
-            public void prepareFailView(String error) {
-                fail("Use case failure is unexpected.");
             }
         };
 
-        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(toDoRepository, successPresenter, new ToDoItemFactory());
+        // Instantiate the interactor and execute the add item use case
+        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(successPresenter, toDoRepository,  new ToDoItemFactory());
         interactor.execute(inputData);
+
+        // Final check to ensure the item was saved in the repository
+        assertNotNull(toDoRepository.get("Grocery Shopping"));
+        assertEquals("Grocery Shopping", toDoRepository.get("Grocery Shopping").getTitle());
     }
 
     @Test
-    void failureTitleExistsTest() {
-        AddToDoItemInputData inputData = new AddToDoItemInputData("Grocery Shopping", "Buy groceries for the week", LocalDate.now(), 2);
+    void failureDuplicateItemTest() {
+        AddToDoItemInputData inputData = new AddToDoItemInputData("Grocery Shopping", "Buy groceries", LocalDate.now(), 2);
         ToDoItemDataAccessInterface toDoRepository = new InMemoryToDoDataAccessObject();
+        toDoRepository.save(new ToDoItemFactory().create("Grocery Shopping", "Buy groceries", LocalDate.now(), 2));
 
-        // Add an item with the same title to the repository
-        ToDoItemFactory factory = new ToDoItemFactory();
-        ToDoItem existingItem = factory.create("Grocery Shopping", "Buy groceries for the week", LocalDate.now(), 2);
-        toDoRepository.save(existingItem);
-
-        // This creates a presenter that tests whether the test case is as we expect.
+        // Create a presenter that verifies failure handling
         AddToDoItemOutputBoundary failurePresenter = new AddToDoItemOutputBoundary() {
             @Override
-            public void prepareSuccessView(AddToDoItemOutputData toDoItemData) {
-                fail("Use case success is unexpected.");
-            }
-
-            @Override
-            public void prepareFailView(String error) {
-                assertEquals("ToDo item with this title already exists.", error);
+            public void presentAddToDoItem(AddToDoItemOutputData outputData) {
+                fail("Expected failure due to duplicate item, but got success instead.");
             }
         };
 
-        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(toDoRepository, failurePresenter, new ToDoItemFactory());
+        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(failurePresenter, toDoRepository,  new ToDoItemFactory());
+
+        // Attempting to add a duplicate item
         interactor.execute(inputData);
+
+        // Verify that the repository still contains only one item with the title
+        assertEquals(1, toDoRepository.getAllToDoItems().size());
     }
 }

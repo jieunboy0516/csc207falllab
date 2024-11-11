@@ -1,7 +1,7 @@
 package use_case.AddItem;
 
 import entity.ToDoItemFactory;
-import entity.ToDoItem
+import entity.ToDoItem;
 
 
 public class AddToDoItemInteractor implements AddToDoItemInputBoundary {
@@ -18,11 +18,13 @@ public class AddToDoItemInteractor implements AddToDoItemInputBoundary {
         this.toDoItemFactory = toDoItemFactory;
     }
 
-    @Override
-    public void addToDoItem(AddToDoItemInputData inputData) {
+
+    public void execute(AddToDoItemInputData inputData) {
         var toDoItem = toDoItemFactory.create(inputData.getTitle(), inputData.getDescription(),
                 inputData.getDueDate(), inputData.getPriority());
         dataAccess.save(toDoItem);
         outputBoundary.presentAddToDoItem(new AddToDoItemOutputData(toDoItem));
     }
+
+
 }
