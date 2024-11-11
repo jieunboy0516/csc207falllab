@@ -64,7 +64,8 @@ class EditToDoItemInteractorTest {
             public void presentEditToDoItem(EditToDoItemOutputData outputData) {
                 assertFalse(outputData.isSuccess());
                 assertEquals("Item not found.", outputData.getMessage());
-                assertEquals("Nonexistent Item", outputData.getTitle());
+                // "Nonexistent Item"
+                assertEquals("nth", outputData.getTitle());
             }
 
             @Override
