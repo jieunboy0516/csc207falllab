@@ -3,7 +3,7 @@ package use_case.EditToDoItem;
 public class EditToDoItemOutputData {
     private final boolean success;
     private final String message;
-    private final String title; // Stores the title of the edited item
+    private final String title;
 
     public EditToDoItemOutputData(boolean success, String message, String title) {
         this.success = success;
