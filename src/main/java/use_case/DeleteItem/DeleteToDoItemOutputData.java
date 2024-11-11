@@ -1,7 +1,5 @@
 package use_case.DeleteItem;
 
-import entity.ToDoItem;
-
 public class DeleteToDoItemOutputData {
     private final boolean success;
     private final String message;
