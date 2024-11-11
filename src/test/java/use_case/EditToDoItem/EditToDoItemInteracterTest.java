@@ -46,7 +46,8 @@ class EditToDoItemInteractorTest {
 
         // Act: Edit the item with a new title and updated details
         EditToDoItemInputData inputData = new EditToDoItemInputData(
-                "Grocery Shopping", "Weekly Grocery Shopping", "Buy groceries for the week", LocalDate.now().plusDays(2), 1, false);
+                "Grocery Shopping", "Weekly Grocery Shopping",
+                "Buy groceries for the week", LocalDate.now().plusDays(2), 1, false);
         EditToDoItemInputBoundary interactor = new EditToDoItemInteractor(toDoRepository, successPresenter);
         interactor.execute(inputData);
 
@@ -124,7 +125,8 @@ class EditToDoItemInteractorTest {
         };
 
         // Act: Attempt to open the edit view for a non-existent item
-        EditToDoItemInteractor interactor = new EditToDoItemInteractor(toDoRepository, presenter);
+        EditToDoItemInteractor interactor;
+        interactor = new EditToDoItemInteractor(toDoRepository, presenter);
         interactor.openEditView("Nonexistent Item");
     }
 }
