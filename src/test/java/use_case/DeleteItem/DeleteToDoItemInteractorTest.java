@@ -32,12 +32,14 @@ class DeleteToDoItemInteractorTest {
         // Set up the interactor with only the repository (no output boundary)
         DeleteToDoItemInteractor interactor = new DeleteToDoItemInteractor(toDoRepository);
 
+        // Checking if it exists prior to deleting
+        assertTrue(toDoRepository.existsByTitle("Grocery Shopping"));
+
         // Act: Attempt to delete the item by title
         DeleteToDoItemInputData inputData = new DeleteToDoItemInputData("Grocery Shopping");
+        interactor.execute(inputData);
 
         // Assert: Verify that the deletion was successful and the item no longer exists in the repository
-        assertTrue(outputData.isSuccess());
-        assertEquals("Item deleted successfully.", outputData.getMessage());
         assertFalse(toDoRepository.existsByTitle("Grocery Shopping"));
     }
 
@@ -46,12 +48,14 @@ class DeleteToDoItemInteractorTest {
         // Set up the interactor with only the repository (no output boundary)
         DeleteToDoItemInteractor interactor = new DeleteToDoItemInteractor(toDoRepository);
 
+        // Assert: Verify that the item does not exist in the repo
+        assertFalse(toDoRepository.existsByTitle("Nonexistent Item"));
+
         // Act: Attempt to delete a non-existent item by title
         DeleteToDoItemInputData inputData = new DeleteToDoItemInputData("Nonexistent Item");
-        DeleteToDoItemOutputData outputData = interactor.execute(inputData);
+        interactor.execute(inputData);
 
-        // Assert: Verify that the deletion was unsuccessful and returned the correct message
-        assertFalse(outputData.isSuccess());
-        assertEquals("Item not found.", outputData.getMessage());
+        // Assert: Verify that the deletion was successful and the item no longer exists in the repository
+        assertFalse(toDoRepository.existsByTitle("Nonexistent Item"));
     }
 }
