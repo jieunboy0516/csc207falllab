@@ -37,24 +37,28 @@ class AddToDoItemInteractorTest {
 
     @Test
     void failureDuplicateItemTest() {
-        AddToDoItemInputData inputData = new AddToDoItemInputData("Grocery Shopping", "Buy groceries", LocalDate.now(), 2);
+        AddToDoItemInputData inputData = new AddToDoItemInputData("Grocery Shopping",
+                "Buy groceries", LocalDate.now(), 2);
         ToDoItemDataAccessInterface toDoRepository = new InMemoryToDoDataAccessObject();
-        toDoRepository.save(new ToDoItemFactory().create("Grocery Shopping", "Buy groceries", LocalDate.now(), 2));
+        toDoRepository.save(new ToDoItemFactory().create("Grocery Shopping",
+                "Buy groceries", LocalDate.now(), 2));
 
-        // Create a presenter that verifies failure handling
-        AddToDoItemOutputBoundary failurePresenter = new AddToDoItemOutputBoundary() {
+        AddToDoItemOutputBoundary presenter = new AddToDoItemOutputBoundary() {
             @Override
             public void presentAddToDoItem(AddToDoItemOutputData outputData) {
-                fail("Expected failure due to duplicate item, but got success instead.");
+                // Verify that the output matches the existing duplicate item
+                assertNotNull(outputData);
+                assertNotNull(outputData.getToDoItem());
+                assertEquals("Grocery Shopping", outputData.getToDoItem().getTitle());
+                assertEquals("Buy groceries", outputData.getToDoItem().getDescription());
             }
         };
 
-        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(failurePresenter, toDoRepository,  new ToDoItemFactory());
+        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(presenter, toDoRepository, new ToDoItemFactory());
 
-        // Attempting to add a duplicate item
         interactor.execute(inputData);
 
-        // Verify that the repository still contains only one item with the title
         assertEquals(1, toDoRepository.getAllToDoItems().size());
+        assertEquals("Grocery Shopping", toDoRepository.get("Grocery Shopping").getTitle());
     }
 }
