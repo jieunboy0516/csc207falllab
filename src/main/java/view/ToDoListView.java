@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import javax.swing.*;
 
 import data_access.InMemoryToDoDataAccessObject;
+import entity.ToDoItem;
 import interface_adapter.EditToDoItem.EditToDoItemController;
 import interface_adapter.addItem.AddToDoItemController;
 import interface_adapter.addItem.AddToDoItemViewModel;
@@ -37,6 +38,7 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
 
     private final JButton addButton;
     private final JButton deleteButton;
+    private final JCheckBox filterIncompleteCheckbox = new JCheckBox("Show only incomplete items");
     private JList<String> toDoListDisplay = new JList<>(new DefaultListModel<>());
     private AddToDoItemController toDoController;
     private EditToDoItemController editToDoController;
@@ -110,6 +112,8 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
+        filterIncompleteCheckbox.addActionListener(evt -> updateToDoListDisplay());
+
         JScrollPane listScrollPane = new JScrollPane(toDoListDisplay);
 
 
@@ -126,6 +130,8 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         this.add(priorityErrorField);
         this.add(buttons);
         this.add(listScrollPane);
+
+        this.add(filterIncompleteCheckbox);
 
         // Initialize the display with current items
         updateToDoListDisplay();
@@ -157,8 +163,12 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
      */
     public void updateToDoListDisplay() {
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        for (String title : toDoDataAccess.getAllToDoItems().keySet()) {
-            listModel.addElement(title);
+        boolean filterIncomplete = filterIncompleteCheckbox.isSelected();
+
+        for (ToDoItem item : toDoDataAccess.getAllToDoItems().values()) {
+            if (!filterIncomplete || !item.isCompleted()) {
+                listModel.addElement(item.getTitle());
+            }
         }
         toDoListDisplay.setModel(listModel);
     }
