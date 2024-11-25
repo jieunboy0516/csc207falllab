@@ -1,5 +1,7 @@
 package view;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 
@@ -10,7 +12,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDate;
+import java.util.Scanner;
 import javax.swing.*;
 
 import data_access.InMemoryToDoDataAccessObject;
@@ -29,6 +34,8 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
     private final AddToDoItemViewModel toDoViewModel;
     private final InMemoryToDoDataAccessObject toDoDataAccess;
 
+
+    private final JTextField usernameInputField = new JTextField(15); // New username input field
     private final JTextField titleInputField = new JTextField(15);
     private final JTextField descriptionInputField = new JTextField(15);
     private final JTextField dueDateInputField = new JTextField(15); // Due date input field
@@ -57,6 +64,9 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         final JLabel title = new JLabel("To-Do List");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+
+        final LabelTextPanel usernameInfo = new LabelTextPanel(
+                new JLabel("Username"), usernameInputField); // New username panel
         final LabelTextPanel titleInfo = new LabelTextPanel(
                 new JLabel("Title"), titleInputField);
         final LabelTextPanel descriptionInfo = new LabelTextPanel(
@@ -74,6 +84,11 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
 
         addButton.addActionListener(evt -> {
             if (evt.getSource().equals(addButton)) {
+                if (!validateUsername(usernameInputField.getText())) {
+                    JOptionPane.showMessageDialog(this, "Invalid username. Please check your input.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 try {
                     LocalDate dueDate = LocalDate.parse(dueDateInputField.getText());
                     toDoController.addToDoItem(
@@ -128,6 +143,7 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
 
         // Layout setup
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.add(usernameInfo);
         this.add(title);
         this.add(titleInfo);
         this.add(titleErrorField);
@@ -184,6 +200,44 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error with text-to-speech: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+
+
+
+    /**
+     * Validates the username by sending a GET request to the API.
+     * @param username the username to validate
+     * @return true if the username exists, false otherwise
+     */
+    private boolean validateUsername(String username) {
+        try {
+            URL url = new URL("https://jsonplaceholder.typicode.com/users");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            if (connection.getResponseCode() == 200) { // Success
+                StringBuilder inline = new StringBuilder();
+                Scanner scanner = new Scanner(connection.getInputStream());
+
+                while (scanner.hasNext()) {
+                    inline.append(scanner.nextLine());
+                }
+                scanner.close();
+
+                // Use JsonParser to parse the JSON response
+                JsonArray users = com.google.gson.JsonParser.parseString(inline.toString()).getAsJsonArray();
+                for (int i = 0; i < users.size(); i++) {
+                    JsonObject user = users.get(i).getAsJsonObject();
+                    if (user.get("username").getAsString().equals(username)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error validating username: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
     }
 
 
