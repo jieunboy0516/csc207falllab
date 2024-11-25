@@ -1,5 +1,8 @@
 package view;
 
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +42,7 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
     private final JButton addButton;
     private final JButton deleteButton;
     private final JCheckBox filterIncompleteCheckbox = new JCheckBox("Show only incomplete items");
+    private final JButton readTitlesButton = new JButton("Read Titles"); // New button for reading titles
     private JList<String> toDoListDisplay = new JList<>(new DefaultListModel<>());
     private AddToDoItemController toDoController;
     private EditToDoItemController editToDoController;
@@ -114,7 +118,12 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
 
         filterIncompleteCheckbox.addActionListener(evt -> updateToDoListDisplay());
 
+        
         JScrollPane listScrollPane = new JScrollPane(toDoListDisplay);
+
+
+        // Add ActionListener for Read Titles Button
+        readTitlesButton.addActionListener(evt -> readTitlesAloud());
 
 
         // Layout setup
@@ -131,11 +140,52 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         this.add(buttons);
         this.add(listScrollPane);
 
+
         this.add(filterIncompleteCheckbox);
+        this.add(readTitlesButton); // Add the "Read Titles" button
+
 
         // Initialize the display with current items
         updateToDoListDisplay();
     }
+
+
+    VoiceManager freeVM;
+    Voice voice;
+
+    public void TextToSpeech(String words) {
+        System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
+        voice = VoiceManager.getInstance().getVoice("kevin16");
+        if (voice != null) {
+            voice.allocate();// Allocating Voice
+            try {
+                voice.setRate(190);// Setting the rate of the voice
+                voice.setPitch(150);// Setting the Pitch of the voice
+                voice.setVolume(3);// Setting the volume of the voice
+                voice.speak(words);
+
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+        } else {
+            throw new IllegalStateException("Cannot find voice: kevin16");
+        }
+    }
+
+    private void readTitlesAloud() {
+        try {
+            for (int i = 0; i < toDoListDisplay.getModel().getSize(); i++) {
+                String title = toDoListDisplay.getModel().getElementAt(i);
+                ToDoItem item = toDoDataAccess.get(title);
+                String status = item.isCompleted() ? "Completed" : "Not Completed";
+                TextToSpeech(title + " : " + status);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error with text-to-speech: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
     /**
      * React to a button click that results in evt.
