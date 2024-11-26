@@ -18,7 +18,7 @@ class DeleteToDoItemInteractorTest {
 
     @BeforeEach
     void setUp() {
-        // Set up the in-memory repository and a factory for creating ToDo items
+        // Set up the in-memory repository and a factory for creating ToDoItems
         toDoRepository = new InMemoryToDoDataAccessObject();
         toDoItemFactory = new ToDoItemFactory();
     }
@@ -26,7 +26,8 @@ class DeleteToDoItemInteractorTest {
     @Test
     void deleteExistingItemTest() {
         // Arrange: Create and save a to-do item in the repository
-        ToDoItem item = toDoItemFactory.create("Grocery Shopping", "Buy groceries", LocalDate.now(), 2);
+        ToDoItem item = toDoItemFactory.create("Grocery Shopping", "Buy groceries",
+                LocalDate.now(), 2);
         toDoRepository.save(item);
 
         // Set up the interactor with only the repository (no output boundary)

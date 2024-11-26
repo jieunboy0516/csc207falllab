@@ -2,6 +2,9 @@ package use_case.DeleteItem;
 
 import use_case.AddItem.ToDoItemDataAccessInterface;
 
+/**
+ * Interface for the Delete ToDoItem use case.
+ */
 public class DeleteToDoItemInteractor implements DeleteToDoItemInputBoundary {
     private final ToDoItemDataAccessInterface toDoDataAccess;
 

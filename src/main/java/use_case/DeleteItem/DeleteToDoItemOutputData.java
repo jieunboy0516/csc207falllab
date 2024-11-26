@@ -1,5 +1,8 @@
 package use_case.DeleteItem;
 
+/**
+ * Output data for the Delete ToDoItem use case.
+ */
 public class DeleteToDoItemOutputData {
     private final boolean success;
     private final String message;

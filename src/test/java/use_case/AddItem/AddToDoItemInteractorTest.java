@@ -12,7 +12,8 @@ class AddToDoItemInteractorTest {
 
     @Test
     void successTest() {
-        AddToDoItemInputData inputData = new AddToDoItemInputData("Grocery Shopping", "Buy groceries for the week", LocalDate.now(), 2);
+        AddToDoItemInputData inputData = new AddToDoItemInputData("Grocery Shopping",
+                "Buy groceries for the week", LocalDate.now(), 2);
         ToDoItemDataAccessInterface toDoRepository = new InMemoryToDoDataAccessObject();
 
         // Create a successPresenter that verifies the output data and repository state
@@ -27,7 +28,8 @@ class AddToDoItemInteractorTest {
         };
 
         // Instantiate the interactor and execute the add item use case
-        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(successPresenter, toDoRepository,  new ToDoItemFactory());
+        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(successPresenter, toDoRepository,
+                new ToDoItemFactory());
         interactor.execute(inputData);
 
         // Final check to ensure the item was saved in the repository
@@ -54,7 +56,8 @@ class AddToDoItemInteractorTest {
             }
         };
 
-        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(presenter, toDoRepository, new ToDoItemFactory());
+        AddToDoItemInputBoundary interactor = new AddToDoItemInteractor(
+                presenter, toDoRepository, new ToDoItemFactory());
 
         interactor.execute(inputData);
 
