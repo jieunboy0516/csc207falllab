@@ -1,10 +1,13 @@
 package data_access;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import entity.ToDoItem;
 import use_case.AddItem.ToDoItemDataAccessInterface;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * In-memory implementation of the DAO for storing ToDo items.
@@ -41,6 +44,26 @@ public class InMemoryToDoDataAccessObject implements ToDoItemDataAccessInterface
 
     @Override
     public Map<String, ToDoItem> getAllToDoItems() {
-        return new HashMap<>(toDoItems); // Return a copy to prevent external modification
+        // Return a copy to prevent external modification
+        return new HashMap<>(toDoItems);
     }
+
+    /**
+     * Returns all the non-completed and upcoming tasks.
+     * @param date this is the date
+     * @return string
+     */
+    public List<String> getUpcomingReminders(LocalDate date) {
+        final List<String> reminders = new ArrayList<>();
+
+        // Example logic to get reminders based on the given date and check if the item is not completed
+        for (ToDoItem item : toDoItems.values()) {
+            if (item.getDueDate().isAfter(date) && !item.isCompleted()) {
+                reminders.add(item.getTitle());
+            }
+        }
+
+        return reminders;
+    }
+
 }

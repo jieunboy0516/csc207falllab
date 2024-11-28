@@ -12,6 +12,7 @@ public class ToDoItem {
     private final LocalDate dueDate;
     private final int priority; // e.g., 1 = High, 2 = Medium, 3 = Low
     private boolean isCompleted;
+    private boolean reminderSent; // Track if a reminder was sent for this item
 
     /**
      * Constructs a ToDoItem with the specified title, description, due date, and priority.
@@ -26,10 +27,19 @@ public class ToDoItem {
         this.description = description;
         this.dueDate = dueDate;
         this.priority = priority;
-        this.isCompleted = false; // default to false when a to-do item is created
+        this.isCompleted = false; // Default to false when a to-do item is created
+        this.reminderSent = false; // Default to false
+    }
+    
+    // Getters and setters
+    public boolean isReminderSent() {
+        return reminderSent;
     }
 
-    // Getters
+    public void setReminderSent(boolean reminderSent) {
+        this.reminderSent = reminderSent;
+    }
+    
     public String getTitle() {
         return title;
     }

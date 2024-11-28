@@ -24,6 +24,7 @@ import interface_adapter.EditToDoItem.EditToDoItemController;
 import interface_adapter.addItem.AddToDoItemController;
 import interface_adapter.addItem.AddToDoItemViewModel;
 import interface_adapter.DeleteItem.DeleteToDoItemController;
+import interface_adapter.reminder.CheckRemindersController;
 
 /**
  * The View for displaying and managing the to-do list.
@@ -48,12 +49,15 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
 
     private final JButton addButton;
     private final JButton deleteButton;
+    private final JButton checkRemindersButton = new JButton("Check Reminders");
     private final JCheckBox filterIncompleteCheckbox = new JCheckBox("Show only incomplete items");
     private final JButton readTitlesButton = new JButton("Read Titles"); // New button for reading titles
     private JList<String> toDoListDisplay = new JList<>(new DefaultListModel<>());
     private AddToDoItemController toDoController;
     private EditToDoItemController editToDoController;
     private DeleteToDoItemController deleteToDoController;
+    private CheckRemindersController checkRemindersController;
+
 
 
     public ToDoListView(AddToDoItemViewModel toDoViewModel, InMemoryToDoDataAccessObject toDoDataAccess) {
@@ -131,6 +135,13 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
+        // Add ActionListener to the "Check Reminders" button
+        checkRemindersButton.addActionListener(evt -> {
+            if (checkRemindersController != null) {
+                checkRemindersController.checkReminders();
+            }
+        });
+
         filterIncompleteCheckbox.addActionListener(evt -> updateToDoListDisplay());
 
         
@@ -155,6 +166,7 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         this.add(priorityErrorField);
         this.add(buttons);
         this.add(listScrollPane);
+        this.add(checkRemindersButton);
 
 
         this.add(filterIncompleteCheckbox);
@@ -293,6 +305,9 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         this.deleteToDoController = deleteToDoController;
     }
 
+    public void setCheckRemindersController(CheckRemindersController checkRemindersController) {
+        this.checkRemindersController = checkRemindersController;
+    }
 
 }
 

@@ -16,6 +16,9 @@ import interface_adapter.DeleteItem.DeleteToDoItemController;
 import interface_adapter.EditToDoItem.EditToDoItemController;
 import interface_adapter.EditToDoItem.EditToDoItemPresenter;
 import interface_adapter.EditToDoItem.EditToDoItemViewModel;
+import interface_adapter.reminder.CheckRemindersController;
+import interface_adapter.reminder.ReminderPresenter;
+import interface_adapter.reminder.ReminderViewModel;
 import use_case.AddItem.AddToDoItemInputBoundary;
 import use_case.AddItem.AddToDoItemInteractor;
 import use_case.AddItem.AddToDoItemOutputBoundary;
@@ -24,6 +27,9 @@ import use_case.DeleteItem.DeleteToDoItemInteractor;
 import use_case.EditToDoItem.EditToDoItemInputBoundary;
 import use_case.EditToDoItem.EditToDoItemInteractor;
 import use_case.EditToDoItem.EditToDoItemOutputBoundary;
+import use_case.reminder.CheckRemindersInputBoundary;
+import use_case.reminder.CheckRemindersInteractor;
+import use_case.reminder.CheckRemindersOutputBoundary;
 import view.ToDoListView;
 import view.EditToDoItemView;
 import view.ViewManager;
@@ -41,6 +47,7 @@ public class AppBuilder {
 
     private ToDoListView toDoListView;
     private AddToDoItemViewModel addToDoItemViewModel;
+    private ReminderViewModel reminderViewModel;
     private EditToDoItemView editToDoItemView;
     private EditToDoItemViewModel editToDoItemViewModel;
 
@@ -77,6 +84,28 @@ public class AppBuilder {
         toDoListView.setToDoController(toDoController);
         return this;
     }
+
+    /**
+     * Adds the Notification Use Case to the application.
+     * @return this builder
+     */
+    public AppBuilder addCheckRemindersUseCase() {
+        // Ensure the ReminderViewModel is initialized
+        reminderViewModel = new ReminderViewModel("Reminder View Model");
+
+        // Create the ReminderPresenter with the ViewModel
+        CheckRemindersOutputBoundary outputBoundary = new ReminderPresenter(reminderViewModel);
+
+        // Initialize the interactor and controller
+        CheckRemindersInputBoundary interactor = new CheckRemindersInteractor(toDoDataAccess, outputBoundary);
+        CheckRemindersController controller = new CheckRemindersController(interactor);
+
+        // Wire the controller to the ToDoListView
+        toDoListView.setCheckRemindersController(controller);
+
+        return this;
+    }
+
 
 
 
