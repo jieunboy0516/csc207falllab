@@ -18,6 +18,7 @@ public class Main {
                 .addAddToDoItemUseCase()
                 .addEditToDoItemUseCase()
                 .addDeleteToDoItemUseCase()
+                .addCheckRemindersUseCase()
                 .build();
 
         application.pack();
