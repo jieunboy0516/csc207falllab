@@ -56,6 +56,19 @@ public class ToDoItem {
         return priority;
     }
 
+    public String getPriorityName() {
+        switch (priority) {
+            case 1:
+                return "High";
+            case 2:
+                return "Medium";
+            case 3:
+                return "Low";
+            default:
+                return "Unknown"; // In case the priority is not 1, 2, or 3
+        }
+    }
+
     public boolean isCompleted() {
         return isCompleted;
     }

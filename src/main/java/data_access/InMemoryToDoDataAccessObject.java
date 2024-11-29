@@ -1,10 +1,10 @@
 package data_access;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import entity.ToDoItem;
 import use_case.AddItem.ToDoItemDataAccessInterface;
@@ -54,16 +54,14 @@ public class InMemoryToDoDataAccessObject implements ToDoItemDataAccessInterface
      * @return string
      */
     public List<String> getUpcomingReminders(LocalDate date) {
-        final List<String> reminders = new ArrayList<>();
-
-        // Example logic to get reminders based on the given date and check if the item is not completed
-        for (ToDoItem item : toDoItems.values()) {
-            if (item.getDueDate().isAfter(date) && !item.isCompleted()) {
-                reminders.add(item.getTitle());
-            }
-        }
-
-        return reminders;
+        return toDoItems.values().stream()
+                .filter(item -> item.getDueDate().isAfter(date) && !item.isCompleted())
+                .sorted((item1, item2) -> item1.getDueDate().compareTo(item2.getDueDate()))
+                .map(item -> {
+                    final long daysLeft = item.getDueDate().toEpochDay() - date.toEpochDay();
+                    return String.format("%s - %d days left - Priority: %s",
+                            item.getTitle(), daysLeft, item.getPriorityName());
+                })
+                .collect(Collectors.toList());
     }
-
 }
