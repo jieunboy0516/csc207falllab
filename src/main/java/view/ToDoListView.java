@@ -25,6 +25,11 @@ import interface_adapter.addItem.AddToDoItemController;
 import interface_adapter.addItem.AddToDoItemViewModel;
 import interface_adapter.DeleteItem.DeleteToDoItemController;
 import interface_adapter.reminder.CheckRemindersController;
+import use_case.schedule.GetTasksForWeekInteractor;
+import interface_adapter.schedule.ScheduleViewPresenter;
+import java.util.ArrayList;
+import java.awt.BorderLayout;
+
 
 /**
  * The View for displaying and managing the to-do list.
@@ -50,6 +55,7 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
     private final JButton addButton;
     private final JButton deleteButton;
     private final JButton checkRemindersButton = new JButton("Check Reminders");
+    private final JButton scheduleViewButton = new JButton("Schedule View");
     private final JCheckBox filterIncompleteCheckbox = new JCheckBox("Show only incomplete items");
     private final JButton readTitlesButton = new JButton("Read Titles"); // New button for reading titles
     private JList<String> toDoListDisplay = new JList<>(new DefaultListModel<>());
@@ -142,6 +148,8 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
+        scheduleViewButton.addActionListener(evt -> showScheduleView());
+
         filterIncompleteCheckbox.addActionListener(evt -> updateToDoListDisplay());
 
         
@@ -167,6 +175,7 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         this.add(buttons);
         this.add(listScrollPane);
         this.add(checkRemindersButton);
+        this.add(scheduleViewButton);
 
 
         this.add(filterIncompleteCheckbox);
@@ -214,6 +223,74 @@ public class ToDoListView extends JPanel implements ActionListener, PropertyChan
         }
     }
 
+    private void showScheduleView() {
+        JFrame scheduleFrame = new JFrame("Weekly Schedule");
+        scheduleFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        scheduleFrame.setSize(800, 400); // Set appropriate size
+
+        // Initialize variables for week navigation
+        final LocalDate[] currentWeekStart = {LocalDate.now().with(java.time.DayOfWeek.SUNDAY)};
+
+        // Create a panel to hold the schedule view and navigation buttons
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Schedule panel placeholder
+        final JPanel[] schedulePanel = {new JPanel()};
+
+        // Method to update the schedule panel
+        Runnable updateSchedule = () -> {
+            // Remove the old schedule panel
+            mainPanel.remove(schedulePanel[0]);
+
+            // Fetch tasks for the current week
+            GetTasksForWeekInteractor interactor = new GetTasksForWeekInteractor();
+            ScheduleViewPresenter presenter = new ScheduleViewPresenter();
+            var allTasks = toDoDataAccess.getAllToDoItems().values();
+            var tasksByWeek = interactor.getTasksForCurrentWeek(new ArrayList<>(allTasks), currentWeekStart[0]);
+
+            // Create a new schedule panel
+            schedulePanel[0] = new ScheduleViewPanel(currentWeekStart[0], tasksByWeek);
+
+            // Add the new schedule panel to the main panel
+            mainPanel.add(schedulePanel[0], BorderLayout.CENTER);
+
+            // Refresh the frame
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        };
+
+        // Navigation buttons
+        JButton prevWeekButton = new JButton("Previous Week");
+        JButton nextWeekButton = new JButton("Next Week");
+        JButton currentWeekButton = new JButton("Current Week");
+
+        prevWeekButton.addActionListener(e -> {
+            currentWeekStart[0] = currentWeekStart[0].minusWeeks(1);
+            updateSchedule.run();
+        });
+
+        nextWeekButton.addActionListener(e -> {
+            currentWeekStart[0] = currentWeekStart[0].plusWeeks(1);
+            updateSchedule.run();
+        });
+
+        currentWeekButton.addActionListener(e -> {
+            currentWeekStart[0] = LocalDate.now().with(java.time.DayOfWeek.SUNDAY);
+            updateSchedule.run();
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(prevWeekButton);
+        buttonPanel.add(currentWeekButton); // Add the "Current Week" button here
+        buttonPanel.add(nextWeekButton);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Initial schedule load
+        updateSchedule.run();
+
+        scheduleFrame.add(mainPanel);
+        scheduleFrame.setVisible(true);
+    }
 
 
 
